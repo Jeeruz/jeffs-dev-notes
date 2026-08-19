@@ -4,19 +4,38 @@
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
-
-
-<div class="m-8 max-w-sm overflow-hidden rounded-xl bg-slate-900 p-6 text-white shadow-2xl transition-all hover:scale-105">
-    <div class="flex items-center space-x-3">
-        <div class="h-3 w-3 animate-pulse rounded-full bg-emerald-500"></div>
-        <span class="font-mono text-xs font-semibold tracking-wider text-emerald-400 uppercase">Tailwind v4 Active</span>
+<div class="my-6 max-w-xl overflow-hidden rounded-xl border border-slate-800 bg-slate-950 font-mono text-sm text-slate-200 shadow-2xl">
+    <!-- Card Header -->
+    <div class="flex items-center justify-between border-b border-slate-800/80 bg-slate-900/60 px-4 py-2.5 font-sans text-xs text-slate-400">
+        <div class="flex items-center space-x-2">
+            <span class="h-3 w-3 rounded-full bg-rose-500/80"></span>
+            <span class="h-3 w-3 rounded-full bg-amber-500/80"></span>
+            <span class="h-3 w-3 rounded-full bg-emerald-500/80"></span>
+            <span class="ml-2 font-mono font-semibold text-slate-400">C#</span>
+        </div>
+        <button class="rounded-md border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-slate-300 transition hover:bg-slate-700 hover:text-white">
+            Copy
+        </button>
     </div>
-    <h3 class="mt-4 text-xl font-bold tracking-tight text-white">Setup Complete!</h3>
-    <p class="mt-2 text-sm text-slate-400">
-        If you see a dark rounded card with green glowing accents and a hover effect, your styles are compiling correctly.
-    </p>
-    <button class="mt-5 w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-emerald-500 transition-colors">
-        Test Button
-    </button>
+
+    <!-- Code Block -->
+    <div class="overflow-x-auto p-4 leading-relaxed">
+        <pre class="whitespace-pre"><code class="text-slate-200">@codeSnippet</code></pre>
+    </div>
 </div>
+
+@code {
+    // Verbatim string (@"...") preserves multiline formatting in C#
+    private string codeSnippet = """ 
+class Car 
+{
+  string color = "red";
+
+  static void Main(string[] args)
+  {
+    Car myObj = new Car();
+    Console.WriteLine(myObj.color);
+  }
+} 
+""";
+}
