@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <Target Name="TailwindBuild" BeforeTargets="Build">
-  	<Exec Command="npx @tailwindcss/cli -i ./wwwroot/app.css -o ./wwwroot/tailwind.css --minify" />
+  	<Exec Command="npx @tailwindcss/cli -i ./wwwroot/app.css -o ./wwwroot/tailwind.css" />
   </Target>
 	
 </Project>
