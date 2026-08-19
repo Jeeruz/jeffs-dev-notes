@@ -1,12 +1,9 @@
-﻿==================================================
-            GIT BRANCH NAMING CONVENTION
-==================================================
+﻿GIT BRANCH NAMING CONVENTION
 
-Format: <type>/<short-description>
 
---------------------------------------------------
-                 COMMON TYPES
---------------------------------------------------
+Format: type/short-description
+
+COMMON TYPES
 
 feature/  : New features or UI components
 fix/      : Bug fixes
@@ -14,17 +11,13 @@ refactor/ : Code improvements or restructuring
 chore/    : Maintenance, dependencies, config updates
 docs/     : Documentation updates
 
---------------------------------------------------
-                   RULES
---------------------------------------------------
+RULES
 
 • Use lowercase only
 • Use hyphens (-) to separate words (kebab-case)
 • Keep it brief, clear, and descriptive
 
---------------------------------------------------
-                 QUICK EXAMPLES
---------------------------------------------------
+QUICK EXAMPLES
 
 feature/markdown-editor
 feature/user-notes-list

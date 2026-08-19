@@ -1,6 +1,4 @@
-﻿==================================================
-              PR TITLE / COMMIT TYPES
-==================================================
+﻿PR TITLE / COMMIT TYPES
 
 feat     : A new feature for the user
 fix      : A bug fix for the user
@@ -10,9 +8,7 @@ docs     : Documentation changes only (README, comments)
 test     : Adding or updating unit/integration tests
 chore    : Maintenance, build tasks, package/dependency updates
 
-==================================================
-                 QUICK EXAMPLES
-==================================================
+QUICK EXAMPLES
 
 feat(notes): add Markdown editor component
 fix(auth): fix session timeout on token refresh
