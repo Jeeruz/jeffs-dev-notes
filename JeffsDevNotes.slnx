@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="JeffsDevNotes.Client/JeffsDevNotes.Client.csproj" />
+  <Project Path="JeffsDevNotes/JeffsDevNotes.csproj" />
+</Solution>
