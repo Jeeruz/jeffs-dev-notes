@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../";
+@source "../../JeffsDevNotes.Client";
 
 h1:focus {
     outline: none;
