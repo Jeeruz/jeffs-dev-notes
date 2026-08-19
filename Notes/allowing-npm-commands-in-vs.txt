@@ -1,0 +1,2 @@
+﻿in your visual studio developer powershell:
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
