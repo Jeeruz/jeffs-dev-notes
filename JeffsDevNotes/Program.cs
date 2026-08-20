@@ -1,10 +1,14 @@
-using JeffsDevNotes.Components;
+using Microsoft.EntityFrameworkCore;
+using JeffsDevNotes.Data;
+using JeffsDevNotes.Components;     
 
 var builder = WebApplication.CreateBuilder(args);
-
+var connectionString = builder.Configuration["SUPABASE_CONNECTION_STRING"];
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
+builder.Services.AddDbContext<NotesContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
