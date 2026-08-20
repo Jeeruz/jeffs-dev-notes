@@ -1,55 +1,30 @@
-﻿<div class="w-full md:w-64 md:h-screen md:sticky md:top-0 bg-[#111827] text-slate-300 border-b md:border-b-0 md:border-r border-slate-800/80 shrink-0 flex flex-col justify-between">
-    <!-- Top Section: Brand & Nav -->
-    <div>
-        <!-- Header / Brand Logo + Mobile Hamburger -->
-        <div class="flex items-center justify-between px-5 py-4 border-b md:border-b-0 border-slate-800/60">
-            <div class="flex items-center gap-3">
-                <span class="text-base font-semibold text-white tracking-tight">My Notes</span>
-            </div>
-
-            <!-- Mobile Hamburger Button -->
-            <button class="md:hidden p-2 text-slate-400 hover:text-white focus:outline-none"
-                    @onclick="ToggleNavMenu">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="@(collapseNavMenu ? "M4 6h16M4 12h16M4 18h16" : "M6 18L18 6M6 6l12 12")" />
-                </svg>
-            </button>
-        </div>
-
-        <!-- Navigation Section -->
-        <nav class="@NavClass px-3 py-4 space-y-1">
-            <NavLink class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800/60 hover:text-white transition-all"
-                     href=""
-                     Match="NavLinkMatch.All"
-                     ActiveClass="!bg-[#1f293d] !text-white font-bold shadow-sm">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 001 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span>Home</span>
-            </NavLink>
-        </nav>
-    </div>
-
-    <!-- Bottom User Profile Footer -->
-    <div class="@NavClass px-4 py-4 border-t border-slate-800/80">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-slate-700 ring-2 ring-slate-600/50 flex items-center justify-center text-xs font-bold text-white overflow-hidden shrink-0">
-                JD
-            </div>
-            <div class="flex flex-col text-xs overflow-hidden">
-                <span class="font-semibold text-white truncate">Jefferson Dela Cruz</span>
-                <span class="text-slate-400 text-[11px] truncate">jdelacruz.proacc@gmail.com</span>
-            </div>
-        </div>
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">SampleWasm</a>
     </div>
 </div>
 
-@code {
-    private bool collapseNavMenu = true;
-    private string NavClass => collapseNavMenu ? "hidden md:block" : "block";
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
