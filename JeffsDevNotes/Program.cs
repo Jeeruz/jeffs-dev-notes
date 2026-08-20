@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using JeffsDevNotes.Data;
 using JeffsDevNotes.Components;     
+using JeffsDevNotes.Data;
+using Microsoft.EntityFrameworkCore;
+using BlazorStrap;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["SUPABASE_CONNECTION_STRING"];
@@ -9,7 +10,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddDbContext<NotesContext>(options =>
     options.UseNpgsql(connectionString));
-
+builder.Services.AddBlazorStrap();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,6 +32,7 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(JeffsDevNotes.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(typeof(JeffsDevNotes.Client._Imports).Assembly)
+    .AddAdditionalAssemblies(typeof(BlazorStrap._Imports).Assembly);
 
 app.Run();

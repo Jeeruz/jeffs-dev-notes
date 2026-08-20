@@ -11,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\JeffsDevNotes.Client\JeffsDevNotes.Client.csproj" />
     <ProjectReference Include="..\JeffsDevNotes.Shared\JeffsDevNotes.Shared.csproj" />
+    <PackageReference Include="BlazorStrap" Version="5.2.104" />
+    <PackageReference Include="BlazorStrap.V5" Version="5.2.104" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.11">
       <PrivateAssets>all</PrivateAssets>
@@ -19,8 +21,4 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
-  <Target Name="TailwindBuild" BeforeTargets="Build">
-  	<Exec Command="npx @tailwindcss/cli -i ./wwwroot/app.css -o ./wwwroot/tailwind.css" />
-  </Target>
-	
 </Project>
