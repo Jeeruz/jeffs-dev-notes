@@ -1,0 +1,29 @@
+* **Page Title (`<h1>`)**
+  * **Font Size:** 40px (2.5rem)
+  * **Tailwind Class:** `text-4xl`
+  * **Font Weight:** 500 (`font-medium`)
+  * **Color Code:** `#212529`
+
+* **Section Title (`<h2>`)**
+  * **Font Size:** 32px (2rem)
+  * **Tailwind Class:** `text-3xl`
+  * **Font Weight:** 500 (`font-medium`)
+  * **Color Code:** `#212529`
+
+* **Sub Header (`<h3>`)**
+  * **Font Size:** 28px (1.75rem)
+  * **Tailwind Class:** `text-2xl`
+  * **Font Weight:** 500 (`font-medium`)
+  * **Color Code:** `#212529`
+
+* **Paragraph (`<p>`)**
+  * **Font Size:** 16px (1rem)
+  * **Tailwind Class:** `text-base`
+  * **Font Weight:** 400 (`font-normal`)
+  * **Color Code:** `#212529`
+
+* **Inline Code (`<code>`)**
+  * **Font Size:** 14px (0.875rem)
+  * **Tailwind Class:** `text-sm`
+  * **Font Weight:** 400 (`font-mono`)
+  * **Color Code:** `#e83e8c`
