@@ -1,0 +1,139 @@
+================================================================================
+JEFFSDEVNOTES - BLAZOR WEB APP & EF CORE ARCHITECTURE REFERENCE
+Date: August 20, 2026
+================================================================================
+
+1. PROJECT ARCHITECTURE & SOLUTION LAYOUT
+--------------------------------------------------------------------------------
+* Architecture Boundary: 3 distinct projects to isolate WebAssembly client code
+  from server database logic and protect sensitive credentials.
+
+* JeffsDevNotes (SERVER - Host App)
+  - Purpose: Main server-side application containing host logic, API endpoints,
+    Razor rendering, DbContext, and migration history.
+  - References: JeffsDevNotes.Shared, JeffsDevNotes.Client
+  - NuGet Packages: Npgsql.EntityFrameworkCore.PostgreSQL
+                    Microsoft.EntityFrameworkCore.Tools
+
+* JeffsDevNotes.Shared (Class Library)
+  - Purpose: Holds plain POCO data models (Note.cs, Category.cs).
+  - References: Shared by both Client and Server. Contains zero DB logic.
+
+* JeffsDevNotes.Client (WASM Frontend)
+  - Purpose: UI components, pages, layout, and client-side logic.
+  - References: JeffsDevNotes.Shared only (cannot see or access the Server).
+
+
+2. DATA MODELS & RELATIONSHIP MAPPING
+--------------------------------------------------------------------------------
+Location: JeffsDevNotes.Shared/
+
+[Category.cs]
+  namespace JeffsDevNotes.Shared;
+
+  public class Category
+  {
+      public int Id { get; set; }
+      public string Name { get; set; } = string.Empty;
+
+      // Collection Navigation Property (1 Category -> Many Notes)
+      public List<Note> Notes { get; set; } = new();
+  }
+
+[Note.cs]
+  namespace JeffsDevNotes.Shared;
+
+  public class Note
+  {
+      public int Id { get; set; }
+      public string Title { get; set; } = string.Empty;
+      public string Content { get; set; } = string.Empty;
+
+      // Foreign Key Column
+      public int CategoryId { get; set; }
+
+      // Reference Navigation Property
+      public Category? Category { get; set; }
+  }
+
+
+3. DATABASE CONTEXT & REGISTRATION
+--------------------------------------------------------------------------------
+Location: JeffsDevNotes (Server)/Data/NotesContext.cs
+Namespace: JeffsDevNotes.Data
+
+[NotesContext.cs]
+  using Microsoft.EntityFrameworkCore;
+  using JeffsDevNotes.Shared;
+
+  namespace JeffsDevNotes.Data;
+
+  public class NotesContext : DbContext
+  {
+      public DbSet<Note> Notes { get; set; }
+      public DbSet<Category> Categories { get; set; }
+
+      public NotesContext(DbContextOptions<NotesContext> options) : base(options)
+      {
+      }
+  }
+
+
+4. ENVIRONMENT SECURITY & CREDENTIALS
+--------------------------------------------------------------------------------
+* Storage: Managed locally via .NET Secrets Manager (secrets.json).
+* Accessing Secrets File:
+  - Visual Studio: Right-click 'JeffsDevNotes (Server)' project -> Manage User Secrets
+  - Windows Path: %APPDATA%\Microsoft\UserSecrets\<UserSecretsId>\secrets.json
+* Key Name: SUPABASE_CONNECTION_STRING
+* Purpose: Prevents database host passwords from entering Git repositories.
+
+
+5. STARTUP CONFIGURATION
+--------------------------------------------------------------------------------
+Location: JeffsDevNotes (Server)/Program.cs
+
+[Program.cs]
+  using Microsoft.EntityFrameworkCore;
+  using JeffsDevNotes.Data;
+  using JeffsDevNotes.Components;     
+
+  var builder = WebApplication.CreateBuilder(args);
+
+  // Retrieve connection string securely from local User Secrets
+  var connectionString = builder.Configuration["SUPABASE_CONNECTION_STRING"];
+
+  // Add services to container
+  builder.Services.AddRazorComponents()
+      .AddInteractiveWebAssemblyComponents();
+
+  builder.Services.AddDbContext<NotesContext>(options =>
+      options.UseNpgsql(connectionString));
+
+  var app = builder.Build();
+
+
+6. EF CORE TOOLING & MIGRATION COMMANDS
+--------------------------------------------------------------------------------
+* Package Required: Microsoft.EntityFrameworkCore.Tools (installed on Server)
+* Execution Window: Tools -> NuGet Package Manager -> Package Manager Console
+* Target Selection: Set "Default project" dropdown to "JeffsDevNotes" (Server)
+
+* Commands:
+  1. Add-Migration InitialCreate
+     - Generates initial database schema C# files locally on the Server project.
+
+  2. Update-Database
+     - Connects to Supabase PostgreSQL and applies pending migrations.
+
+  3. Remove-Migration
+     - Removes the last local migration (if NOT yet applied via Update-Database).
+
+
+7. FUTURE MODEL UPDATE WORKFLOW
+--------------------------------------------------------------------------------
+Step 1: Modify or add C# entity properties inside JeffsDevNotes.Shared.
+Step 2: Open Package Manager Console (Target project: JeffsDevNotes [Server]).
+Step 3: Run command: Add-Migration <DescriptiveMigrationName>
+Step 4: Run command: Update-Database
+================================================================================
