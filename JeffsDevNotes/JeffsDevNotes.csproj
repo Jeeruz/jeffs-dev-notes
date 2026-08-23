@@ -13,6 +13,7 @@
     <ProjectReference Include="..\JeffsDevNotes.Shared\JeffsDevNotes.Shared.csproj" />
     <PackageReference Include="BlazorStrap" Version="5.2.104" />
     <PackageReference Include="BlazorStrap.V5" Version="5.2.104" />
+    <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.11">
       <PrivateAssets>all</PrivateAssets>

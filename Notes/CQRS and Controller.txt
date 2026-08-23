@@ -1,0 +1,394 @@
+================================================================================
+JEFFSDEVNOTES - MASTER CQRS & MEDIATR IMPLEMENTATION MANUAL WITH SYNTAX
+================================================================================
+
+PHASE 0: INSTALL NUGET PACKAGES (JeffsDevNotes [Server])
+--------------------------------------------------------------------------------
+1. Action: Install MediatR in the Server project via Package Manager Console or .NET CLI
+
+2. .NET CLI Command:
+   dotnet add package MediatR
+
+3. Package Manager Console:
+   Install-Package MediatR
+
+
+--------------------------------------------------------------------------------
+END-TO-END DATA FLOW DIAGRAM
+--------------------------------------------------------------------------------
+[Client] (Blazor WASM Component)
+   │
+   ├─► Sends HTTP POST payload (CreateNoteRequest)
+   ▼
+[Controllers/NotesController.cs]
+   │
+   ├─► Wraps DTO in CreateNoteCommand and calls _mediator.Send(...)
+   ▼
+[Application/Commands/CreateNoteCommand.cs]
+   │
+   ├─► CreateNoteCommandHandler processes business logic & persists to DB
+   └─► Returns NoteResponse back up to Client
+   
+[Controllers/NotesController.cs]
+   │
+   ├─► Receives HTTP GET request and calls _mediator.Send(new GetNotesQuery())
+   ▼
+[Application/Queries/GetNotesQuery.cs]
+   │
+   ├─► GetNotesQueryHandler queries DB with AsNoTracking()
+   └─► Returns List<NoteResponse> back up to Client
+--------------------------------------------------------------------------------
+
+
+PHASE 1: SET UP DATA CONTRACTS & ENTITIES (JeffsDevNotes.Shared)
+--------------------------------------------------------------------------------
+1. Action: Verify domain entities match exact schema in `JeffsDevNotes.Shared`
+
+2. Entity File: [Note.cs]
+   using System;
+   using System.Collections.Generic;
+   using System.Text;
+
+   namespace JeffsDevNotes.Shared
+   {
+       public class Note
+       {
+           public int Id { get; set; }
+           public string Content { get; set; } = string.Empty;
+           public string Description { get; set; } = string.Empty;
+
+           // Foreign Key Column
+           public int CategoryId { get; set; }
+
+           // Navigation Property
+           public Category? Category { get; set; }
+       }
+   }
+
+3. Entity File: [Category.cs]
+   using System;
+   using System.Collections.Generic;
+   using System.Text;
+
+   namespace JeffsDevNotes.Shared
+   {
+       public class Category
+       {
+           public int Id { get; set; }
+           public string Name { get; set; } = string.Empty;
+           public string Description { get; set; } = string.Empty;
+
+           // Navigation Property (One category has many notes)
+           public List<Note> Notes { get; set; } = new();
+       }
+   }
+
+4. Create Request File: [CreateNoteRequest.cs]
+   namespace JeffsDevNotes.Shared.DTOs;
+
+   public class CreateNoteRequest
+   {
+       public string Content { get; set; } = string.Empty;
+       public string Description { get; set; } = string.Empty;
+       public int CategoryId { get; set; }
+   }
+
+5. Create Response File: [NoteResponse.cs]
+   namespace JeffsDevNotes.Shared.DTOs;
+
+   public class NoteResponse
+   {
+       public int Id { get; set; }
+       public string Content { get; set; } = string.Empty;
+       public string Description { get; set; } = string.Empty;
+       public int CategoryId { get; set; }
+       public string CategoryName { get; set; } = string.Empty;
+   }
+
+
+PHASE 2: VERIFY DATABASE CONTEXT (JeffsDevNotes [Server])
+--------------------------------------------------------------------------------
+1. Action: Locate or create `JeffsDevNotes (Server)/Data/NotesContext.cs`
+
+2. Context File: [NotesContext.cs]
+   using Microsoft.EntityFrameworkCore;
+   using JeffsDevNotes.Shared;
+
+   namespace JeffsDevNotes.Data;
+
+   public class NotesContext : DbContext
+   {
+       public DbSet<Note> Notes { get; set; } = null!;
+       public DbSet<Category> Categories { get; set; } = null!;
+
+       public NotesContext(DbContextOptions<NotesContext> options) : base(options)
+       {
+       }
+   }
+
+
+PHASE 3: BUILD APPLICATION CQRS LAYER (JeffsDevNotes [Server])
+--------------------------------------------------------------------------------
+1. Action: Create application directories
+   - JeffsDevNotes (Server)/Application/Commands/
+   - JeffsDevNotes (Server)/Application/Queries/
+
+2. Implement Write Operation: [CreateNoteCommand.cs]
+   using MediatR;
+   using JeffsDevNotes.Data;
+   using JeffsDevNotes.Shared;
+   using JeffsDevNotes.Shared.DTOs;
+
+   namespace JeffsDevNotes.Application.Commands;
+
+   // Marks this record as a MediatR write request expecting a NoteResponse return type
+   public record CreateNoteCommand(CreateNoteRequest Request) : IRequest<NoteResponse>;
+
+   // Handles the write logic for CreateNoteCommand
+   public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, NoteResponse>
+   {
+       private readonly NotesContext _db;
+
+       // Injects the Entity Framework database context
+       public CreateNoteCommandHandler(NotesContext db)
+       {
+           _db = db;
+       }
+
+       public async Task<NoteResponse> Handle(CreateNoteCommand command, CancellationToken cancellationToken)
+       {
+           // Map the incoming payload to the updated domain entity
+           var note = new Note
+           {
+               Content = command.Request.Content,
+               Description = command.Request.Description,
+               CategoryId = command.Request.CategoryId
+           };
+
+           // Stage and persist the new record to the database asynchronously
+           _db.Notes.Add(note);
+           await _db.SaveChangesAsync(cancellationToken);
+
+           // Fetch related entity data to complete the response contract
+           var category = await _db.Categories.FindAsync(new object[] { note.CategoryId }, cancellationToken);
+
+           // Return flattened response DTO
+           return new NoteResponse
+           {
+               Id = note.Id,
+               Content = note.Content,
+               Description = note.Description,
+               CategoryId = note.CategoryId,
+               CategoryName = category?.Name ?? "Uncategorized"
+           };
+       }
+   }
+
+3. Implement Read Operation: [GetNotesQuery.cs]
+   using MediatR;
+   using Microsoft.EntityFrameworkCore;
+   using JeffsDevNotes.Data;
+   using JeffsDevNotes.Shared.DTOs;
+
+   namespace JeffsDevNotes.Application.Queries;
+
+   // Marks this record as a MediatR read request expecting a List<NoteResponse> return type
+   public record GetNotesQuery : IRequest<List<NoteResponse>>;
+
+   // Handles the read logic for GetNotesQuery
+   public class GetNotesQueryHandler : IRequestHandler<GetNotesQuery, List<NoteResponse>>
+   {
+       private readonly NotesContext _db;
+
+       public GetNotesQueryHandler(NotesContext db)
+       {
+           _db = db;
+       }
+
+       public async Task<List<NoteResponse>> Handle(GetNotesQuery request, CancellationToken cancellationToken)
+       {
+           return await _db.Notes
+               // Eager load related Category entity
+               .Include(n => n.Category)
+               // Optimization: Disables change tracking overhead for read-only queries
+               .AsNoTracking()
+               // Project database records directly into response DTOs using Updated properties
+               .Select(n => new NoteResponse
+               {
+                   Id = n.Id,
+                   Content = n.Content,
+                   Description = n.Description,
+                   CategoryId = n.CategoryId,
+                   CategoryName = n.Category != null ? n.Category.Name : "Uncategorized"
+               })
+               .ToListAsync(cancellationToken);
+       }
+   }
+
+
+PHASE 4: CREATE THIN WEB API CONTROLLER (JeffsDevNotes [Server])
+--------------------------------------------------------------------------------
+1. Action: Create directory `JeffsDevNotes (Server)/Controllers/`
+
+2. Implement API Routes: [NotesController.cs]
+   using MediatR;
+   using Microsoft.AspNetCore.Mvc;
+   using JeffsDevNotes.Application.Commands;
+   using JeffsDevNotes.Application.Queries;
+   using JeffsDevNotes.Shared.DTOs;
+
+   namespace JeffsDevNotes.Controllers;
+
+   [ApiController]
+   [Route("api/[controller]")]
+   public class NotesController : ControllerBase
+   {
+       private readonly IMediator _mediator;
+
+       // Injects MediatR mediator service instead of business logic services directly
+       public NotesController(IMediator mediator)
+       {
+           _mediator = mediator;
+       }
+
+       [HttpGet]
+       public async Task<ActionResult<List<NoteResponse>>> GetNotes()
+       {
+           // Dispatches query request through MediatR pipeline to its matching Handler
+           var response = await _mediator.Send(new GetNotesQuery());
+           return Ok(response);
+       }
+
+       [HttpPost]
+       public async Task<ActionResult<NoteResponse>> CreateNote([FromBody] CreateNoteRequest request)
+       {
+           // Wraps DTO payload in a Command object and dispatches to handler
+           var response = await _mediator.Send(new CreateNoteCommand(request));
+           return CreatedAtAction(nameof(GetNotes), new { id = response.Id }, response);
+       }
+   }
+
+
+PHASE 5: WIRE UP STARTUP SERVICES & PIPELINE
+--------------------------------------------------------------------------------
+1. Action: Configure host services in both Server and Client Program.cs files
+
+2. Server Startup File: [JeffsDevNotes (Server)/Program.cs]
+   using BlazorStrap;
+   using JeffsDevNotes.Components;
+   using JeffsDevNotes.Data;
+   using Microsoft.AspNetCore.Components;
+   using Microsoft.EntityFrameworkCore;
+
+   var builder = WebApplication.CreateBuilder(args);
+
+   // Retrieve PostgreSQL connection string from application settings or environment variables
+   var connectionString = builder.Configuration["SUPABASE_CONNECTION_STRING"];
+
+   // Add Blazor UI component services and enable WebAssembly interactive rendering mode
+   builder.Services.AddRazorComponents()
+       .AddInteractiveWebAssemblyComponents();
+
+   // Register EF Core DbContext with PostgreSQL driver (Npgsql)
+   builder.Services.AddDbContext<NotesContext>(options =>
+       options.UseNpgsql(connectionString));
+
+   // Register BlazorStrap UI services for Bootstrap components
+   builder.Services.AddBlazorStrap();
+
+   // Register Web API Controller routing infrastructure
+   builder.Services.AddControllers();
+
+   // Register MediatR handlers by scanning the Server assembly
+   builder.Services.AddMediatR(cfg =>
+       cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+   // Register HttpClient using NavigationManager to automatically detect the base URL during SSR/prerendering
+   builder.Services.AddScoped(sp =>
+   {
+       var navigationManager = sp.GetRequiredService<NavigationManager>();
+       return new HttpClient { BaseAddress = new Uri(navigationManager.BaseUri) };
+   });
+
+   var app = builder.Build();
+
+   // Configure environment-specific error handling middleware
+   if (app.Environment.IsDevelopment())
+   {
+       app.UseWebAssemblyDebugging();
+   }
+   else
+   {
+       app.UseExceptionHandler("/Error", createScopeForErrors: true);
+       app.UseHsts();
+   }
+
+   // Enable standard ASP.NET Core middleware pipeline
+   app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+   app.UseHttpsRedirection();
+   app.UseRouting();
+   app.UseAuthorization();
+   app.UseAntiforgery();
+
+   // Map static web assets (CSS, JS, images)
+   app.MapStaticAssets();
+
+   // Map Web API Controllers to support /api/[controller] endpoints
+   app.MapControllers();
+
+   // Map root Blazor application component and register WebAssembly assemblies
+   app.MapRazorComponents<App>()
+       .AddInteractiveWebAssemblyRenderMode()
+       .AddAdditionalAssemblies(typeof(JeffsDevNotes.Client._Imports).Assembly)
+       .AddAdditionalAssemblies(typeof(BlazorStrap._Imports).Assembly);
+
+   app.Run();
+
+3. Client Startup File: [JeffsDevNotes.Client/Program.cs]
+   using BlazorStrap;
+   using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
+   var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+   // Register HttpClient for client-side API requests using the browser's base host address
+   builder.Services.AddScoped(sp => new HttpClient
+   {
+       BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+   });
+
+   // Register BlazorStrap UI component services for WebAssembly client execution
+   builder.Services.AddBlazorStrap();
+
+   await builder.Build().RunAsync();
+
+
+PHASE 6: CALL API FROM CLIENT (JeffsDevNotes.Client)
+--------------------------------------------------------------------------------
+1. Action: Consume endpoints from WASM pages or services
+
+2. Client Usage Syntax:
+   @inject HttpClient Http
+   @using JeffsDevNotes.Shared.DTOs
+
+   @code {
+       private List<NoteResponse> notes = new();
+
+       // GET Example
+       protected override async Task OnInitializedAsync()
+       {
+           // Client issues HTTP GET to controller endpoint
+           notes = await Http.GetFromJsonAsync<List<NoteResponse>>("api/notes") ?? new();
+       }
+
+       // POST Example
+       private async Task SaveNote(CreateNoteRequest request)
+       {
+           // Client issues HTTP POST sending request DTO payload
+           var response = await Http.PostAsJsonAsync("api/notes", request);
+           if (response.IsSuccessStatusCode)
+           {
+               var createdNote = await response.Content.ReadFromJsonAsync<NoteResponse>();
+           }
+       }
+   }
+================================================================================
