@@ -1,39 +1,54 @@
 ﻿@page "/"
+@using BlazorStrap
 
 <h3>Home</h3>
 
 <h3>Create a table and a modal for crud</h3>    
 
 <BSTable IsResponsive="true" IsStriped="true">
+
     <BSTHead>
+
         <BSTR>
-            <BSTD>#</BSTD>  
-            <BSTD>First</BSTD>
-            <BSTD>Last</BSTD>
-            <BSTD>Handle</BSTD>
+            <BSTD>Content</BSTD>
+            <BSTD>Description</BSTD>
+            <BSTD>Category</BSTD>
         </BSTR>
+
     </BSTHead>
-    <BSTBody>
-        <BSTR>
-            <BSTD>1</BSTD>
-            <BSTD>John</BSTD>
-            <BSTD>Doe</BSTD>
-            <BSTD>JohnDoe <br/>media.com</BSTD>
-        </BSTR>
-        <BSTR>
-            <BSTD>2</BSTD>
-            <BSTD>Jane</BSTD>
-            <BSTD>Doe</BSTD>
-            <BSTD>JaneDoe <br/>media.com</BSTD>
-        </BSTR>
+
+    <BSTBody>  
+
+        @for (int note = 0; note < Notes.Count; note++)
+        {
+            <BSTR>
+                <BSTD>Notes[note].Content</BSTD>
+                <BSTD>Notes[note].Description</BSTD>
+                <BSTD>Notes[note].Category</BSTD>
+            </BSTR>          
+        }
+
     </BSTBody>
+
     <BSTFoot>
+
         <BSTR>
             <BSTD ColSpan="4">Spanned Table Footer Here</BSTD>
         </BSTR>
 
     </BSTFoot>
+
+    <BSModal DataId="create-note">
+
+        <Header>You are about to do something</Header>
+        <Content>Are you sure you want to do something?</Content>
+        <Footer Context="modal">
+            <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancel</BSButton>
+            <BSButton Color="BSColor.Primary" @onclick="@(() => modal.HideAsync(true))">Ok</BSButton>
+        </Footer>
+
+    </BSModal>
+
+    <BSButton Color="@BSColor.Primary" Target="create-note">Launch demo modal</BSButton>
+
 </BSTable>
-
-
- 
