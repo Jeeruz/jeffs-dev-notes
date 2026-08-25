@@ -1,0 +1,32 @@
+﻿@using BlazorStrap
+<BSModal @ref="modalRef" IsCentered="true">
+    <Header>Create New Note</Header>
+    <Content>    
+        <!-- Content Field -->
+        <div class="mb-3">
+            <label for="content" class="form-label font-weight-bold">Content</label>
+            <BSInput InputType="InputType.Text" id="content" @bind-Value="CreateNoteModel.Content" Placeholder="Enter note title or content..." />
+        </div>
+    
+        <!-- Description Field -->
+        <div class="mb-3">
+            <label for="description" class="form-label font-weight-bold">Description</label>
+            <BSInput InputType="InputType.TextArea" id="description" Row="3" @bind-Value="CreateNoteModel.Description" Placeholder="Enter detailed description..." />
+        </div>
+    
+        <!-- Category ID Selection -->
+        <div class="mb-3">
+            <label for="categoryId" class="form-label font-weight-bold">Category ID</label>
+            <BSInput InputType="InputType.Number" id="categoryId" @bind-Value="CreateNoteModel.CategoryId" />
+        </div>
+    </Content>
+    <Footer>
+        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modalRef.HideAsync())">
+            Cancel
+        </BSButton>
+        <BSButton Color="BSColor.Primary" @onclick="@SaveAsync">
+            Save Note
+        </BSButton>
+    </Footer>
+
+</BSModal>

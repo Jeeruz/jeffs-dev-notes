@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace JeffsDevNotes.Shared.DTOs
+﻿namespace JeffsDevNotes.Shared.DTOs
 {
     public class NoteResponse
     {

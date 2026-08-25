@@ -1,4 +1,6 @@
 using BlazorStrap;
+using JeffsDevNotes.Client.Interfaces;
+using JeffsDevNotes.Client.Services;
 using JeffsDevNotes.Components;
 using JeffsDevNotes.Data;
 using Microsoft.AspNetCore.Components;
@@ -31,6 +33,9 @@ builder.Services.AddBlazorStrap();
 
 // Register MVC Controller infrastructure to enable RESTful Web API endpoints (/api/[controller]).
 builder.Services.AddControllers();
+
+// Register Client Managers
+builder.Services.AddScoped<INoteManager, NoteManager>();
 
 // Register MediatR request handlers, notifications, and behaviors by scanning the server assembly.
 builder.Services.AddMediatR(cfg =>

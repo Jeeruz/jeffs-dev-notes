@@ -1,4 +1,6 @@
 using BlazorStrap;
+using JeffsDevNotes.Client.Interfaces;
+using JeffsDevNotes.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 // ===================================================================================
@@ -21,6 +23,9 @@ builder.Services.AddScoped(sp => new HttpClient
 
 // Register BlazorStrap services to enable Bootstrap 5 UI component rendering on the client side.
 builder.Services.AddBlazorStrap();
+
+// Register Client Managers
+builder.Services.AddScoped<INoteManager, NoteManager>();
 
 // ===================================================================================
 // APPLICATION HOST BUILD & RUN
