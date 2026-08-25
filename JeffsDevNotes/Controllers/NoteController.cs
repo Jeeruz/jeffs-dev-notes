@@ -8,12 +8,12 @@ namespace JeffsDevNotes.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class NotesController : ControllerBase
+    public class NoteController : ControllerBase
     {
         private readonly IMediator _mediator;
 
         // Injects MediatR mediator service instead of business logic services directly
-        public NotesController(IMediator mediator)
+        public NoteController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -31,7 +31,9 @@ namespace JeffsDevNotes.Controllers
         {
             // Wraps DTO payload in a Command object and dispatches to handler
             var response = await _mediator.Send(new CreateNoteCommand(request));
-            return CreatedAtAction(nameof(GetNotes), new { id = response.Id }, response);
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
         }
     }
 }

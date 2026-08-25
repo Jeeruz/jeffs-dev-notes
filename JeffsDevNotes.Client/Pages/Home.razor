@@ -3,7 +3,8 @@
 
 <h3>Home</h3>
 
-<h3>Create a table and a modal for crud</h3>    
+<BSButton Color="@BSColor.Primary" @onclick="OpenCreateNoteModal">Add Note</BSButton>
+<BSButton Color="@BSColor.Secondary" @onclick="OpenCreateCategoryModal">Add Category</BSButton>
 
 <BSTable IsResponsive="true" IsStriped="true">
 
@@ -38,17 +39,8 @@
 
     </BSTFoot>
 
-    <BSModal DataId="create-note">
-
-        <Header>You are about to do something</Header>
-        <Content>Are you sure you want to do something?</Content>
-        <Footer Context="modal">
-            <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancel</BSButton>
-            <BSButton Color="BSColor.Primary" @onclick="@(() => modal.HideAsync(true))">Ok</BSButton>
-        </Footer>
-
-    </BSModal>
-
-    <BSButton Color="@BSColor.Primary" Target="create-note">Launch demo modal</BSButton>
-
 </BSTable>
+
+<!-- Reusable Modal Component -->
+<CreateCategoryModal @ref="CreateCategoryModal" OnCategoryCreated="CreateCategory" />
+<CreateNoteModal @ref="CreateNoteModal" OnNoteCreated="CreateNote" />
