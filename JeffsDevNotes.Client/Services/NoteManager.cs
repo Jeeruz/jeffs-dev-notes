@@ -46,6 +46,39 @@ namespace JeffsDevNotes.Client.Services
             return null;
         }
 
+        public async Task<NoteResponse?> UpdateNoteAsync(CreateNoteRequest request)
+        {
+            try
+            {
+                var response = await _http.PostAsJsonAsync("api/note", request);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<NoteResponse>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        public async Task<bool> DeleteNoteAsync(int id)
+        {
+            try
+            {
+                var response = await _http.DeleteAsync("api/note/{id}");
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+            }
+
+            return false;
+        }
+
         public async Task<List<CategoryResponse>> GetCategoriesAsync()
         {
             try
@@ -76,6 +109,39 @@ namespace JeffsDevNotes.Client.Services
             }
 
             return null;
+        }
+
+        public async Task<CategoryResponse?> UpdateCategoryAsync(CreateCategoryRequest request)
+        {
+            try
+            {
+                var response = await _http.PostAsJsonAsync("api/category/{id}", request);
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadFromJsonAsync<CategoryResponse>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+            }
+
+            return null;
+        }
+
+        public async Task<bool> DeleteCategoryAsync(int id)
+        {
+            try
+            {
+                var response = await _http.DeleteAsync("api/category/{id}");
+                return response.IsSuccessStatusCode;      
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+            }
+
+            return false;
         }
     }
 }

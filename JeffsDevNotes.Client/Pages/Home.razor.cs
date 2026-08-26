@@ -35,7 +35,7 @@ namespace JeffsDevNotes.Client.Pages
         // Modal Visibility Control
         protected async Task OpenCreateNoteModal()
         {
-            CreateNoteModel = new CreateNoteRequest(); // Reset form model
+            CreateNoteModel = new CreateNoteRequest(); 
             IsNoteModalOpen = true;
 
             await CreateNoteModal.ShowAsync();  
@@ -43,7 +43,7 @@ namespace JeffsDevNotes.Client.Pages
 
         protected async Task OpenCreateCategoryModal()
         {
-            CreateCategoryModel = new CreateCategoryRequest(); // Reset form model
+            CreateCategoryModel = new CreateCategoryRequest();
             IsCategoryModalOpen = true;
 
             await CreateCategoryModal.ShowAsync();

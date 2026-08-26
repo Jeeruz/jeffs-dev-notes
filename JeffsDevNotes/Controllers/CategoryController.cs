@@ -36,5 +36,23 @@ namespace JeffsDevNotes.Controllers
             // Simple 200 OK return without location routing
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<ActionResult<CategoryResponse>> UpdateCategory([FromBody] CreateCategoryRequest request)
+        {
+            // Wraps DTO payload in a Command object and dispatches to handler
+            var response = await _mediator.Send(new UpdateCategoryCommand(request));
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
+        }
+
+
+        [HttpDelete("api/category/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var result = await _mediator.Send(new DeleteCategoryCommand(id));
+            return Ok(result);
+        }
     }
 }

@@ -35,5 +35,25 @@ namespace JeffsDevNotes.Controllers
             // Simple 200 OK return without location routing
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<ActionResult<NoteResponse>> UpdateNote([FromBody] CreateNoteRequest request)
+        {
+            // Wraps DTO payload in a Command object and dispatches to handler
+            var response = await _mediator.Send(new UpdateNoteCommand(request));
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
+        }
+
+        [HttpDelete("api/note/{id}")]
+        public async Task<ActionResult<NoteResponse>> DeleteNote([FromBody] CreateNoteRequest request)
+        {
+            // Wraps DTO payload in a Command object and dispatches to handler
+            var response = await _mediator.Send(new DeleteNoteCommand(request));
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
+        }
     }
 }
