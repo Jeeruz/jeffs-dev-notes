@@ -12,9 +12,13 @@ namespace JeffsDevNotes.Client.Components
         public EventCallback<CreateNoteRequest> OnNoteEvent { get; set; }
 
         [Parameter]
-        public CreateNoteRequest NoteRequest { get; set; }
+        public CreateNoteRequest NoteRequest { get; set; } = new();
 
-        protected CreateNoteRequest CreateNoteModel { get; set; } = new();
+        [Parameter]
+        public bool Delete { get; set; } = false;
+
+        [Parameter]
+        public List<CategoryResponse> Categories { get; set; } = new();
 
         // Expose a method for parent pages to call directly via @ref
         public async Task ShowAsync()
@@ -30,11 +34,11 @@ namespace JeffsDevNotes.Client.Components
 
         private async Task SaveAsync()
         {
-            if (!string.IsNullOrWhiteSpace(CreateNoteModel.Content))
+            if (!string.IsNullOrWhiteSpace(NoteRequest.Content))
             {
-                await OnNoteEvent.InvokeAsync(CreateNoteModel);
+                await OnNoteEvent.InvokeAsync(NoteRequest);
                 await HideAsync();
-            }
+            } 
         }
     }
 }

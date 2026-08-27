@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Application\Commands\Categories\UpdateCategoryCommand.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\JeffsDevNotes.Client\JeffsDevNotes.Client.csproj" />
     <ProjectReference Include="..\JeffsDevNotes.Shared\JeffsDevNotes.Shared.csproj" />
     <PackageReference Include="BlazorStrap" Version="5.2.104" />

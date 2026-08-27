@@ -1,32 +1,51 @@
 ﻿@using BlazorStrap
-<BSModal @ref="modalRef" IsCentered="true">
-    <Header>Create New Note</Header>
-    <Content>    
-        <!-- Content Field -->
-        <div class="mb-3">
-            <label for="content" class="form-label font-weight-bold">Content</label>
-            <BSInput InputType="InputType.Text" id="content" @bind-Value="CreateNoteModel.Content" Placeholder="Enter note title or content..." />
-        </div>
-    
-        <!-- Description Field -->
-        <div class="mb-3">
-            <label for="description" class="form-label font-weight-bold">Description</label>
-            <BSInput InputType="InputType.TextArea" id="description" Row="3" @bind-Value="CreateNoteModel.Description" Placeholder="Enter detailed description..." />
-        </div>
-    
-        <!-- Category ID Selection -->
-        <div class="mb-3">
-            <label for="categoryId" class="form-label font-weight-bold">Category ID</label>
-            <BSInput InputType="InputType.Number" id="categoryId" @bind-Value="CreateNoteModel.CategoryId" />
-        </div>
-    </Content>
-    <Footer>
-        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modalRef.HideAsync())">
-            Cancel
-        </BSButton>
-        <BSButton Color="BSColor.Primary" @onclick="@SaveAsync">
-            Save Note
-        </BSButton>
-    </Footer>
 
-</BSModal>
+@if (Delete == false)
+{
+    <BSModal @ref="modalRef" IsCentered="true">
+        <Header>Create New Note</Header>
+        <Content>
+            <!-- Content Field -->
+            <div class="mb-3">
+                <label for="content" class="form-label font-weight-bold">Content</label>
+                <BSInput InputType="InputType.Text" id="content" @bind-Value="NoteRequest.Content" Placeholder="Enter note title or content..." />
+            </div>
+            <!-- Description Field -->
+            <div class="mb-3">
+                <label for="description" class="form-label font-weight-bold">Description</label>
+                <BSInput InputType="InputType.TextArea" id="description" Row="3" @bind-Value="NoteRequest.Description" Placeholder="Enter detailed description..." />
+            </div>
+            <!-- Category ID Selection -->
+            <div class="mb-3">
+                <label class="form-label">Select Category</label>
+                <select class="form-select" @bind="NoteRequest.CategoryId">
+                    @foreach (var category in Categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </select>
+            </div>
+        </Content>
+        <Footer>
+            <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modalRef.HideAsync())">
+                Cancel
+            </BSButton>
+            <BSButton Color="BSColor.Primary" @onclick="@SaveAsync">
+                Save Note
+            </BSButton>
+        </Footer>
+    </BSModal>
+}
+else
+{
+    <BSModal @ref="modalRef" IsCentered="true">
+        <Header>Delete Note</Header>
+        <Content>
+            <p class="mb-3 fs-5">Are you sure you want to delete this note?</p>
+            <div class="d-flex justify-content-end gap-2">
+                <BSButton Color="BSColor.Secondary" @onclick="HideAsync">Cancel</BSButton>
+                <BSButton Color="BSColor.Danger" @onclick="SaveAsync">Delete</BSButton>
+            </div>
+        </Content>
+    </BSModal>
+}

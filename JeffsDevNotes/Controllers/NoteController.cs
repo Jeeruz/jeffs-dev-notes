@@ -1,4 +1,5 @@
 ﻿using JeffsDevNotes.Application.Commands;
+using JeffsDevNotes.Application.Commands.Notes;
 using JeffsDevNotes.Application.Queries;
 using JeffsDevNotes.Shared.DTOs;
 using MediatR;

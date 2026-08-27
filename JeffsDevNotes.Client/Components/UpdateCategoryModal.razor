@@ -10,12 +10,10 @@
                 <label for="categoryName" class="form-label font-weight-bold">Category Name</label>
                 <BSInput InputType="InputType.Text" id="categoryName" @bind-Value="UpdateCategoryModel.Name" Placeholder="Enter category name..." />
             </div>
-
             <div class="mb-3">
                 <label for="categoryDescription" class="form-label font-weight-bold">Description</label>
                 <BSInput InputType="InputType.TextArea" id="categoryDescription" Row="3" @bind-Value="UpdateCategoryModel.Description" Placeholder="Enter description..." />
             </div>
-
             <div class="d-flex justify-content-end gap-2 mt-4">
                 <BSButton Color="BSColor.Secondary" @onclick="HideAsync">Cancel</BSButton>
                 <BSButton IsSubmit="true" Color="BSColor.Primary">Save Category</BSButton>

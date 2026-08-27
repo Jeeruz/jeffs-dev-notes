@@ -1,4 +1,4 @@
-﻿using JeffsDevNotes.Application.Commands;
+﻿using JeffsDevNotes.Application.Commands.Categories;
 using JeffsDevNotes.Application.Queries;
 using JeffsDevNotes.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +46,6 @@ namespace JeffsDevNotes.Controllers
             // Simple 200 OK return without location routing
             return Ok(response);
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
