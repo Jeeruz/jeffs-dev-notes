@@ -9,8 +9,8 @@ namespace JeffsDevNotes.Application.Commands
 {
     // Marks this record as a MediatR write request expecting a NoteResponse return type
     public record CreateNoteCommand(CreateNoteRequest Request) : IRequest<NoteResponse>;
-    public record UpdateNoteCommand(CreateNoteRequest Request) : IRequest<NoteResponse>;
-    public record DeleteNoteCommand(CreateNoteRequest Request) : IRequest<NoteResponse>;
+    public record UpdateNoteCommand(int id, CreateNoteRequest Request) : IRequest<NoteResponse>;
+    public record DeleteNoteCommand(int id) : IRequest<NoteResponse>;
 
     public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, NoteResponse>
     {
@@ -92,7 +92,7 @@ namespace JeffsDevNotes.Application.Commands
         public async Task<NoteResponse> Handle(DeleteNoteCommand command, CancellationToken cancellationToken)
         {
             // Map the incoming payload to the domain entity
-            var Note = await _db.Notes.SingleAsync(forDeletetion => forDeletetion.Id == command.Request.Id);
+            var Note = await _db.Notes.SingleAsync(forDeletetion => forDeletetion.Id == command.id);
 
             // Stage and persist the new record to the database asynchronously
             _db.Notes.Remove(Note);

@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Components;
-using JeffsDevNotes.Shared.DTOs;
-using JeffsDevNotes.Client.Interfaces;
 using JeffsDevNotes.Client.Components;
+using JeffsDevNotes.Client.Interfaces;
+using JeffsDevNotes.Client.Services;
+using JeffsDevNotes.Shared.DTOs;
+using Microsoft.AspNetCore.Components;
 
 namespace JeffsDevNotes.Client.Pages
 {
@@ -9,9 +10,10 @@ namespace JeffsDevNotes.Client.Pages
     {
         [Inject]
         public HttpClient Http { get; set; } = default!;
-
         [Inject]
-        protected INoteManager NoteManager { get; set; } = default!;
+        protected INote NoteService { get; set; } = default!;
+        [Inject]
+        protected ICategory CategoryService { get; set; } = default!;
 
         // Page State
         protected List<NoteResponse> Notes { get; set; } = new();
@@ -19,39 +21,27 @@ namespace JeffsDevNotes.Client.Pages
         protected bool IsLoading { get; set; } = true;
 
         // Modal State and Model Binding 
-        protected CreateCategoryModal CreateCategoryModal { get; set; } = default!;
-        protected CreateNoteModal CreateNoteModal { get; set; } = default!;
+        protected NoteModal NoteModal { get; set; } = default!;
         protected bool IsNoteModalOpen { get; set; } = false;
-        protected bool IsCategoryModalOpen { get; set; } = false;
-        protected CreateNoteRequest CreateNoteModel { get; set; } = new();
-        protected CreateCategoryRequest CreateCategoryModel { get; set; } = new();
+        protected bool IsnoteModalOpen { get; set; } = false;
+        protected CreateNoteRequest NoteModel { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
-            Notes = await NoteManager.GetNotesAsync();
-            Categories = await NoteManager.GetCategoriesAsync();
+            Notes = await NoteService.GetNotesAsync();
+            Categories = await CategoryService.GetCategoriesAsync();
         }
 
         // Modal Visibility Control
         protected async Task OpenCreateNoteModal()
         {
-            CreateNoteModel = new CreateNoteRequest(); 
-            IsNoteModalOpen = true;
-
-            await CreateNoteModal.ShowAsync();  
-        }
-
-        protected async Task OpenCreateCategoryModal()
-        {
-            CreateCategoryModel = new CreateCategoryRequest();
-            IsCategoryModalOpen = true;
-
-            await CreateCategoryModal.ShowAsync();
+            NoteModel = new CreateNoteRequest(); 
+            await NoteModal.ShowAsync();  
         }
         
         protected async Task CreateNote(CreateNoteRequest createNoteModel)
         {
-            var response = await NoteManager.CreateNoteAsync(createNoteModel);
+            var response = await NoteService.CreateNoteAsync(createNoteModel);
 
             if (response != null && response.Id != 0)
             {
@@ -59,13 +49,23 @@ namespace JeffsDevNotes.Client.Pages
             }
         }
 
-        protected async Task CreateCategory(CreateCategoryRequest createCategoryModel)
+        protected async Task UpdateNote(CreateNoteRequest createNoteModel)
         {
-            var response = await NoteManager.CreateCategoryAsync(createCategoryModel);
+            var response = await NoteService.UpdateNoteAsync(createNoteModel.Id, createNoteModel);
 
             if (response != null && response.Id != 0)
             {
-                Categories.Add(response);
+             
+            }
+        }
+
+        protected async Task DeleteNote(CreateNoteRequest createNoteModel)
+        {
+            var response = await NoteService.DeleteNoteAsync(createNoteModel.Id);
+
+            if (response != false)
+            {
+                Notes = Notes.Where(note => note.Id != createNoteModel.Id).ToList();
             }
         }
     }

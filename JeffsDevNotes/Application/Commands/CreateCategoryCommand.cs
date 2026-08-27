@@ -9,7 +9,7 @@ namespace JeffsDevCategorys.Application.Commands
 {
     // Marks this record as a MediatR write request expecting a CategoryResponse return type
     public record CreateCategoryCommand(CreateCategoryRequest Request) : IRequest<CategoryResponse>;
-    public record UpdateCategoryCommand(CreateCategoryRequest Request) : IRequest<CategoryResponse>;
+    public record UpdateCategoryCommand(int id, CreateCategoryRequest Request) : IRequest<CategoryResponse>;
     public record DeleteCategoryCommand(int id) : IRequest<CategoryResponse>;
 
     public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, CategoryResponse>
@@ -57,7 +57,7 @@ namespace JeffsDevCategorys.Application.Commands
 
         public async Task<CategoryResponse> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken)
         {
-            var Category = await _db.Categories.SingleAsync(forDeletetion => forDeletetion.Id == command.Request.Id);
+            var Category = await _db.Categories.SingleAsync(forDeletetion => forDeletetion.Id == command.id);
             Category.Name = command.Request.Name;
             Category.Description = command.Request.Description;
 

@@ -4,19 +4,22 @@ using Microsoft.AspNetCore.Components;
 
 namespace JeffsDevNotes.Client.Components
 {
-    public partial class CreateNoteModal
+    public partial class NoteModal
     {
         private BSModal modalRef = default!;
 
         [Parameter]
-        public EventCallback<CreateNoteRequest> OnNoteCreated { get; set; }
+        public EventCallback<CreateNoteRequest> OnNoteEvent { get; set; }
+
+        [Parameter]
+        public CreateNoteRequest NoteRequest { get; set; }
 
         protected CreateNoteRequest CreateNoteModel { get; set; } = new();
 
         // Expose a method for parent pages to call directly via @ref
         public async Task ShowAsync()
         {
-            CreateNoteModel = new CreateNoteRequest(); // Reset form model
+            NoteRequest = NoteRequest.Id != 0 ? NoteRequest : new();
             await modalRef.ShowAsync();
         }
 
@@ -29,7 +32,7 @@ namespace JeffsDevNotes.Client.Components
         {
             if (!string.IsNullOrWhiteSpace(CreateNoteModel.Content))
             {
-                await OnNoteCreated.InvokeAsync(CreateNoteModel);
+                await OnNoteEvent.InvokeAsync(CreateNoteModel);
                 await HideAsync();
             }
         }
