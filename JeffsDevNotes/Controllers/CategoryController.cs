@@ -1,4 +1,4 @@
-﻿using JeffsDevNotes.Application.Commands;
+﻿using JeffsDevNotes.Application.Commands.Categories;
 using JeffsDevNotes.Application.Queries;
 using JeffsDevNotes.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +35,23 @@ namespace JeffsDevNotes.Controllers
 
             // Simple 200 OK return without location routing
             return Ok(response);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<CategoryResponse>> UpdateCategory(int id, [FromBody] CreateCategoryRequest request)
+        {
+            // Wraps DTO payload in a Command object and dispatches to handler
+            var response = await _mediator.Send(new UpdateCategoryCommand(id, request));
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var result = await _mediator.Send(new DeleteCategoryCommand(id));
+            return Ok(result);
         }
     }
 }

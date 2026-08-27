@@ -1,0 +1,146 @@
+﻿@page "/category"
+@using BlazorStrap
+@using Microsoft.AspNetCore.Components;
+@using JeffsDevNotes.Shared.DTOs;
+@using JeffsDevNotes.Client.Interfaces;
+@using JeffsDevNotes.Client.Components;
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Categories</h3>
+    <BSButton Color="@BSColor.Primary" @onclick="OpenCreateCategoryModal">Add</BSButton>
+</div>
+
+<BSTable IsResponsive="true" IsStriped="true">
+    <BSTHead>
+        <BSTR>
+            <BSTD>Name</BSTD>
+            <BSTD>Description</BSTD>
+            <BSTD>Active</BSTD>
+        </BSTR>
+    </BSTHead>
+    <BSTBody>
+        @foreach (var category in Categories)
+        {
+            <BSTR>
+                <BSTD>@category.Name</BSTD>
+                <BSTD>@category.Description</BSTD>
+                <BSTD>             
+                    <BSButton Color="@BSColor.Secondary" @onclick="() => OpenUpdateCategoryModal(category.Id)">Edit</BSButton>
+                    <BSButton Color="@BSColor.Warning" @onclick="() => OpenDeleteCategoryModal(category.Id)">Delete</BSButton>
+                </BSTD>
+            </BSTR>
+        }
+    </BSTBody>
+</BSTable>
+
+<!-- Reusable Modal Component -->
+<CreateCategoryModal @ref="CreateCategoryModal" OnCategoryCreated="CreateCategory" />
+<UpdateCategoryModal @ref="UpdateCategoryModal" OnCategoryUpdated="UpdateCategory" UpdateCategoryModel="SelectedCategory" />
+<DeleteCategoryModal @ref="DeleteCategoryModal" OnCategoryDeleted="DeleteCategory" CategoryId="SelectedCategory.Id" />
+
+@code
+{
+    [Inject]
+    public HttpClient Http { get; set; } = default!;
+
+    [Inject]
+    protected ICategory CategoryService { get; set; } = default!;
+
+    // Page State
+    protected bool IsLoading { get; set; } = true;
+    protected List<CategoryResponse> Categories { get; set; } = new();
+
+    // Modal State and Model Binding
+    protected CreateCategoryRequest SelectedCategory { get; set; } = new();
+    protected CreateCategoryModal CreateCategoryModal { get; set; } = default!;
+    protected UpdateCategoryModal UpdateCategoryModal { get; set; } = default!;
+    protected DeleteCategoryModal DeleteCategoryModal { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await CategoryService.GetCategoriesAsync();
+    }
+
+    protected async Task OpenCreateCategoryModal()
+    {
+        await CreateCategoryModal.ShowAsync();
+    }  
+
+    protected async Task OpenUpdateCategoryModal(int id)
+    {
+        await SelectRow(id);
+        await UpdateCategoryModal.ShowAsync();
+    }
+
+    protected async Task OpenDeleteCategoryModal(int id)
+    {
+        await SelectRow(id);
+        await DeleteCategoryModal.ShowAsync();
+    }
+
+    protected async Task OpenModal(string modal)
+    {
+        if(modal == "create")
+        {
+            await CreateCategoryModal.ShowAsync();
+        }
+        else if(modal == "update")
+        {
+            await UpdateCategoryModal.ShowAsync();
+        }
+    }
+
+    private async Task SelectRow(int id)
+    {
+        var match = Categories.FirstOrDefault(category => category.Id == id);
+        if (match != null)
+        {
+            SelectedCategory = new CreateCategoryRequest
+                {
+                    Id = match.Id,
+                    Name = match.Name,
+                    Description = match.Description
+                };
+        }
+    }
+
+    protected async Task CreateCategory(CreateCategoryRequest createCategoryModel)
+    {
+        var response = await CategoryService.CreateCategoryAsync(createCategoryModel);
+
+        if (response != null && response.Id != 0)
+        {
+            Categories.Add(response);
+        }
+    }
+
+    protected async Task UpdateCategory(CreateCategoryRequest createCategoryModel)
+    {
+        var response = await CategoryService.UpdateCategoryAsync(createCategoryModel.Id, createCategoryModel);
+
+        if (response != null && response.Id != 0)
+        {
+            // Search the in-memory list for the position (0-based index) of the existing item matching the updated ID.
+            // Returns -1 if no matching category is found.
+            var index = Categories.FindIndex(c => c.Id == response.Id);
+
+            // Check if the item actually exists in the list
+            if (index != -1)
+            {
+                // Replace the old object directly at its existing position with the updated response.
+                // This updates the specific row in-place, preserving list order and triggering a clean Blazor UI re-render.
+                Categories[index] = response;
+            }
+        }
+    }
+
+    protected async Task DeleteCategory(int id)
+    {
+        var response = await CategoryService.DeleteCategoryAsync(id);
+
+        if (response != false)
+        {
+            Categories = Categories.Where(category => category.Id != id).ToList();
+        }
+    }
+}

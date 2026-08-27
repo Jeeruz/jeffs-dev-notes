@@ -1,0 +1,48 @@
+﻿@using BlazorStrap
+
+<BSModal @ref="modalRef" IsCentered="true">
+    <Header>Delete Category</Header>
+    <Content>
+        <p class="mb-3 fs-5">Are you sure you want to delete this category?</p>
+        <div class="d-flex justify-content-end gap-2">
+            <BSButton Color="BSColor.Secondary" @onclick="HideAsync">Cancel</BSButton>
+            <BSButton Color="BSColor.Danger" @onclick="SaveAsync">Delete</BSButton>
+        </div>
+    </Content>
+</BSModal>
+
+@code
+{
+    private BSModal modalRef = default!;
+
+    [Parameter]
+    public EventCallback<int> OnCategoryDeleted { get; set; }
+
+    [Parameter]
+    public int CategoryId { get; set; } = new();
+
+    // Expose a method for parent pages to call directly via @ref
+    public async Task ShowAsync()
+    {
+        await modalRef.ShowAsync();
+    }
+
+    public async Task HideAsync()
+    {
+        await modalRef.HideAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (CategoryId != 0)
+        {
+            await OnCategoryDeleted.InvokeAsync(CategoryId);
+            await HideAsync();
+        }
+        else
+        {
+            await HideAsync();
+        }
+    }
+}
+

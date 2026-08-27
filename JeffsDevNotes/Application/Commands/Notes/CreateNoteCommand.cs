@@ -1,13 +1,12 @@
-﻿using MediatR;
-using JeffsDevNotes.Data;
+﻿using JeffsDevNotes.Data;
 using JeffsDevNotes.Shared;
 using JeffsDevNotes.Shared.DTOs;
+using MediatR;
 
 namespace JeffsDevNotes.Application.Commands
 {
     // Marks this record as a MediatR write request expecting a NoteResponse return type
     public record CreateNoteCommand(CreateNoteRequest Request) : IRequest<NoteResponse>;
-
     public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, NoteResponse>
     {
         private readonly NotesContext _db;

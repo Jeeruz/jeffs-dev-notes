@@ -2,11 +2,11 @@
 
 namespace JeffsDevNotes.Client.Interfaces
 {
-    public interface INoteManager
+    public interface INote
     {
         Task<List<NoteResponse>> GetNotesAsync();
         Task<NoteResponse?> CreateNoteAsync(CreateNoteRequest request);
-        Task<List<CategoryResponse>> GetCategoriesAsync();
-        Task<CategoryResponse?> CreateCategoryAsync(CreateCategoryRequest request);
+        Task<NoteResponse?> UpdateNoteAsync(int id, CreateNoteRequest request);
+        Task<bool> DeleteNoteAsync(int id); 
     }
 }

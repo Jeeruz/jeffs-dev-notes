@@ -25,7 +25,8 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddBlazorStrap();
 
 // Register Client Managers
-builder.Services.AddScoped<INoteManager, NoteManager>();
+builder.Services.AddScoped<INote, NoteService>();
+builder.Services.AddScoped<ICategory, CategoryService>();
 
 // ===================================================================================
 // APPLICATION HOST BUILD & RUN

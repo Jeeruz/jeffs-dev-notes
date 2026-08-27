@@ -35,7 +35,8 @@ builder.Services.AddBlazorStrap();
 builder.Services.AddControllers();
 
 // Register Client Managers
-builder.Services.AddScoped<INoteManager, NoteManager>();
+builder.Services.AddScoped<INote, NoteService>();
+builder.Services.AddScoped<ICategory, CategoryService>();
 
 // Register MediatR request handlers, notifications, and behaviors by scanning the server assembly.
 builder.Services.AddMediatR(cfg =>

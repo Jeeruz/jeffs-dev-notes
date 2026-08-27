@@ -1,4 +1,5 @@
 ﻿using JeffsDevNotes.Application.Commands;
+using JeffsDevNotes.Application.Commands.Notes;
 using JeffsDevNotes.Application.Queries;
 using JeffsDevNotes.Shared.DTOs;
 using MediatR;
@@ -31,6 +32,26 @@ namespace JeffsDevNotes.Controllers
         {
             // Wraps DTO payload in a Command object and dispatches to handler
             var response = await _mediator.Send(new CreateNoteCommand(request));
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<NoteResponse>> UpdateNote(int id, [FromBody] CreateNoteRequest request)
+        {
+            // Wraps DTO payload in a Command object and dispatches to handler
+            var response = await _mediator.Send(new UpdateNoteCommand( id, request));
+
+            // Simple 200 OK return without location routing
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<NoteResponse>> DeleteNote(int id)
+        {
+            // Wraps DTO payload in a Command object and dispatches to handler
+            var response = await _mediator.Send(new DeleteNoteCommand(id));
 
             // Simple 200 OK return without location routing
             return Ok(response);

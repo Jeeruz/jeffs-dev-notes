@@ -3,11 +3,10 @@ using JeffsDevNotes.Data;
 using JeffsDevNotes.Shared;
 using JeffsDevNotes.Shared.DTOs;
 
-namespace JeffsDevCategorys.Application.Commands
+namespace JeffsDevNotes.Application.Commands.Categories
 {
     // Marks this record as a MediatR write request expecting a CategoryResponse return type
-    public record CreateCategoryCommand(CreateCategoryRequest Request) : IRequest<CategoryResponse>;
-
+    public record CreateCategoryCommand(CreateCategoryRequest Request) : IRequest<CategoryResponse>; 
     public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, CategoryResponse>
     {
         private readonly NotesContext _db;
