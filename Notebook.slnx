@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="NoteBook.Client/NoteBook.Client.csproj" />
+  <Project Path="NoteBook.Shared/NoteBook.Shared.csproj" />
+  <Project Path="NoteBook/NoteBook.csproj" />
+</Solution>

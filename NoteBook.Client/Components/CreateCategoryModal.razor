@@ -1,0 +1,57 @@
+﻿@using NoteBook.Shared.DTOs
+@using BlazorStrap
+
+<BSModal @ref="modalRef" IsCentered="true">
+    <Header>Create New Category</Header>
+    <Content>
+        <EditForm Model="@CreateCategoryModel" OnValidSubmit="SaveAsync" Context="editContext">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="categoryName" class="form-label font-weight-bold">Category Name</label>
+                <BSInput InputType="InputType.Text" id="categoryName" @bind-Value="CreateCategoryModel.Name" Placeholder="Enter category name..." />
+            </div>
+
+            <div class="mb-3">
+                <label for="categoryDescription" class="form-label font-weight-bold">Description</label>
+                <BSInput InputType="InputType.TextArea" id="categoryDescription" Row="3" @bind-Value="CreateCategoryModel.Description" Placeholder="Enter description..." />
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <BSButton Color="BSColor.Secondary" @onclick="HideAsync">Cancel</BSButton>
+                <BSButton IsSubmit="true" Color="BSColor.Primary">Save Category</BSButton>
+            </div>
+        </EditForm>
+    </Content>
+</BSModal>
+
+@code 
+{
+    private BSModal modalRef = default!;
+    
+    [Parameter]
+    public EventCallback<CreateCategoryRequest> OnCategoryCreated { get; set; }
+    
+    protected CreateCategoryRequest CreateCategoryModel { get; set; } = new();
+    
+    // Expose a method for parent pages to call directly via @ref
+    public async Task ShowAsync()
+    {
+        CreateCategoryModel = new CreateCategoryRequest(); // Reset form model
+        await modalRef.ShowAsync();
+    }
+    
+    public async Task HideAsync()
+    {
+        await modalRef.HideAsync();
+    }
+    
+    private async Task SaveAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(CreateCategoryModel.Name))
+        {
+            await OnCategoryCreated.InvokeAsync(CreateCategoryModel);
+            await HideAsync();
+        }
+    }
+}
+
