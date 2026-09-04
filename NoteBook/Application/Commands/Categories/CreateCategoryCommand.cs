@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using NoteBook.Data;
-using NoteBook.Shared;
+using NoteBook.Shared.Entities;
 using NoteBook.Shared.DTOs;
 
 namespace NoteBook.Application.Commands.Categories
@@ -19,24 +19,32 @@ namespace NoteBook.Application.Commands.Categories
 
         public async Task<CategoryResponse> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
         {
-            // Map the incoming payload to the domain entity
-            var Category = new Category
+            try
             {
-                Name = command.Request.Name,
-                Description = command.Request.Description
-            };  
+                // Map the incoming payload to the domain entity
+                var Category = new Category
+                {
+                    Name = command.Request.Name,
+                    Description = command.Request.Description
+                };
 
-            // Stage and persist the new record to the database asynchronously
-            _db.Categories.Add(Category);
-            await _db.SaveChangesAsync(cancellationToken);
+                // Stage and persist the new record to the database asynchronously
+                _db.Categories.Add(Category);
+                await _db.SaveChangesAsync(cancellationToken);
 
-            // Return flattened response DTO
-            return new CategoryResponse
+                // Return flattened response DTO
+                return new CategoryResponse
+                {
+                    Id = Category.Id,
+                    Name = Category.Name,
+                    Description = Category.Description,
+                };
+            }
+            catch(Exception ex)
             {
-                Id = Category.Id,
-                Name = Category.Name,
-                Description = Category.Description,
-            };
+                throw;
+            }
+
         }
     }
 }

@@ -1,13 +1,14 @@
-﻿using NoteBook.Data;
+﻿using MediatR;
+using NoteBook.Data;
 using NoteBook.Shared.DTOs;
-using MediatR;
+using NoteBook.Shared.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace NoteBook.Application.Commands
 {
     // Marks this record as a MediatR write request expecting a NoteResponse return type
-    public record DeleteNoteCommand(int id) : IRequest<NoteResponse>;
-    public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, NoteResponse>
+    public record DeleteNoteCommand(int id) : IRequest<Result<NoteResponse>>;
+    public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, Result<NoteResponse>>
     {
         private readonly NotesContext _db;
 
@@ -17,17 +18,27 @@ namespace NoteBook.Application.Commands
             _db = db;
         }
 
-        public async Task<NoteResponse> Handle(DeleteNoteCommand command, CancellationToken cancellationToken)
+        public async Task<Result<NoteResponse>> Handle(DeleteNoteCommand command, CancellationToken cancellationToken)
         {
-            // Map the incoming payload to the domain entity
-            var Note = await _db.Notes.SingleAsync(forDeletetion => forDeletetion.Id == command.id);
+            try
+            {
+                // Map the incoming payload to the domain entity
+                var Note = await _db.Notes.SingleAsync(forDeletetion => forDeletetion.Id == command.id);
 
-            // Stage and persist the new record to the database asynchronously
-            _db.Notes.Remove(Note);
-            var status = await _db.SaveChangesAsync(cancellationToken);
+                // Stage and persist the new record to the database asynchronously
+                _db.Notes.Remove(Note);
+                var status = await _db.SaveChangesAsync(cancellationToken);
 
-            // Return flattened response DTO
-            return new NoteResponse();
+                // Return flattened response DTO
+                var response = new NoteResponse();
+
+                return Result<NoteResponse>.Success(response);
+            }
+            catch(Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                return Result<NoteResponse>.Failure(message);
+            }
         }
     }
 }

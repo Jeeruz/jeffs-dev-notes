@@ -2,7 +2,7 @@
 
 namespace NoteBook.Client.Interfaces
 {
-    public interface ICategory
+    public interface ICategoryService
     {
         Task<List<CategoryResponse>> GetCategoriesAsync();
         Task<CategoryResponse?> CreateCategoryAsync(CreateCategoryRequest request);

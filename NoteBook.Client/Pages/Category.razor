@@ -44,7 +44,7 @@
     public HttpClient Http { get; set; } = default!;
 
     [Inject]
-    protected ICategory CategoryService { get; set; } = default!;
+    protected ICategoryService CategoryService { get; set; } = default!;
 
     // Page State
     protected bool IsLoading { get; set; } = true;

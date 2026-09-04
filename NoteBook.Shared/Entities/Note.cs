@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteBook.Shared
+namespace NoteBook.Shared.Entities
 {
     public class Note
     {
@@ -16,5 +16,4 @@ namespace NoteBook.Shared
         // Navigation Property
         public Category? Category { get; set; }
     }
-
 }

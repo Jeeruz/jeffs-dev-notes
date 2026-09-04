@@ -2,6 +2,7 @@
 using NoteBook.Application.Commands.Notes;
 using NoteBook.Application.Queries;
 using NoteBook.Shared.DTOs;
+using NoteBook.Shared.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +29,7 @@ namespace NoteBook.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<NoteResponse>> CreateNote([FromBody] CreateNoteRequest request)
+        public async Task<ActionResult<Result<NoteResponse>>> CreateNote([FromBody] CreateNoteRequest request)
         {
             // Wraps DTO payload in a Command object and dispatches to handler
             var response = await _mediator.Send(new CreateNoteCommand(request));
@@ -38,7 +39,7 @@ namespace NoteBook.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<NoteResponse>> UpdateNote(int id, [FromBody] CreateNoteRequest request)
+        public async Task<ActionResult<Result<NoteResponse>>> UpdateNote(int id, [FromBody] CreateNoteRequest request)
         {
             // Wraps DTO payload in a Command object and dispatches to handler
             var response = await _mediator.Send(new UpdateNoteCommand( id, request));
@@ -48,7 +49,7 @@ namespace NoteBook.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<NoteResponse>> DeleteNote(int id)
+        public async Task<ActionResult<Result<NoteResponse>>> DeleteNote(int id)
         {
             // Wraps DTO payload in a Command object and dispatches to handler
             var response = await _mediator.Send(new DeleteNoteCommand(id));

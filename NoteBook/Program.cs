@@ -36,7 +36,8 @@ builder.Services.AddControllers();
 
 // Register Client Managers
 builder.Services.AddScoped<INoteService, NoteService>();
-builder.Services.AddScoped<ICategory, CategoryService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IToastService, ToastService>();
 
 // Register MediatR request handlers, notifications, and behaviors by scanning the server assembly.
 builder.Services.AddMediatR(cfg =>

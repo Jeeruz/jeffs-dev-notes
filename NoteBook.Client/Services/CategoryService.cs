@@ -4,7 +4,7 @@ using NoteBook.Shared.DTOs;
 
 namespace NoteBook.Client.Services
 {
-    public class CategoryService : ICategory
+    public class CategoryService : ICategoryService
     {
         private readonly HttpClient _http;
 
