@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NoteBook.Shared;
+using NoteBook.Shared.Entities;
 
 namespace NoteBook.Data
 {

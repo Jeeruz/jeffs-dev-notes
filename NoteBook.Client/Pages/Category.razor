@@ -1,9 +1,9 @@
 ﻿@page "/category"
 @using BlazorStrap
-@using Microsoft.AspNetCore.Components;
 @using NoteBook.Shared.DTOs;
 @using NoteBook.Client.Interfaces;
 @using NoteBook.Client.Components;
+@using Microsoft.AspNetCore.Components;
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="m-0">Categories</h3>
@@ -42,9 +42,10 @@
 {
     [Inject]
     public HttpClient Http { get; set; } = default!;
-
     [Inject]
-    protected ICategory CategoryService { get; set; } = default!;
+    protected ICategoryService CategoryService { get; set; } = default!;
+    [Inject]
+    protected IToastService ToastService { get; set; } = default!;
 
     // Page State
     protected bool IsLoading { get; set; } = true;
@@ -108,9 +109,14 @@
     {
         var response = await CategoryService.CreateCategoryAsync(createCategoryModel);
 
-        if (response != null && response.Id != 0)
+        if (response != null && response.Value != null)
         {
-            Categories.Add(response);
+            Categories.Add(response.Value);
+            await ToastService.ShowAsync(BSColor.Success, "Success", "Successfully Created");
+        }
+        else
+        {
+            await ToastService.ShowAsync(BSColor.Danger, "Error", response?.ErrorMessage ?? "There is something wrong");
         }
     }
 
@@ -118,19 +124,27 @@
     {
         var response = await CategoryService.UpdateCategoryAsync(createCategoryModel.Id, createCategoryModel);
 
-        if (response != null && response.Id != 0)
+        if (response != null && response.Value != null)
         {
-            // Search the in-memory list for the position (0-based index) of the existing item matching the updated ID.
-            // Returns -1 if no matching category is found.
-            var index = Categories.FindIndex(c => c.Id == response.Id);
-
-            // Check if the item actually exists in the list
-            if (index != -1)
+            if (response != null && response.Value != null)
             {
-                // Replace the old object directly at its existing position with the updated response.
-                // This updates the specific row in-place, preserving list order and triggering a clean Blazor UI re-render.
-                Categories[index] = response;
+                // Search the in-memory list for the position (0-based index) of the existing item matching the updated ID.
+                // Returns -1 if no matching category is found.
+                var index = Categories.FindIndex(c => c.Id == response.Value.Id);
+
+                // Check if the item actually exists in the list
+                if (index != -1)
+                {
+                    // Replace the old object directly at its existing position with the updated response.
+                    // This updates the specific row in-place, preserving list order and triggering a clean Blazor UI re-render.
+                    Categories[index] = response.Value;
+                }
             }
+            await ToastService.ShowAsync(BSColor.Success, "Success", "Successfully Updated");
+        }
+        else
+        {
+            await ToastService.ShowAsync(BSColor.Danger, "Error", response?.ErrorMessage ?? "There is something wrong");
         }
     }
 
@@ -138,9 +152,14 @@
     {
         var response = await CategoryService.DeleteCategoryAsync(id);
 
-        if (response != false)
+        if (response != null && response.Value != null)
         {
             Categories = Categories.Where(category => category.Id != id).ToList();
+            await ToastService.ShowAsync(BSColor.Success, "Success", "Successfully Deleted");
+        }
+        else
+        {
+            await ToastService.ShowAsync(BSColor.Danger, "Error", response?.ErrorMessage ?? "There is something wrong");
         }
     }
 }

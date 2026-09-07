@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Json;
-using NoteBook.Client.Interfaces;
+﻿using NoteBook.Client.Interfaces;
+using NoteBook.Shared.Common;
 using NoteBook.Shared.DTOs;
+using System.Net.Http.Json;
 
 namespace NoteBook.Client.Services
 {
@@ -36,64 +37,67 @@ namespace NoteBook.Client.Services
         // POST: api/note
         // Routing: Sends an HTTP POST to "api/note".
         // Controller Matching: NoteController.cs sees HTTP POST -> maps body payload to [HttpPost] CreateNote([FromBody] CreateNoteRequest request).
-        public async Task<NoteResponse?> CreateNoteAsync(CreateNoteRequest request)
+        public async Task<Result<NoteResponse>> CreateNoteAsync(CreateNoteRequest request)
         {
+            var response = await _http.PostAsJsonAsync("api/note", request);
             try
             {
-                var response = await _http.PostAsJsonAsync("api/note", request);
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<NoteResponse>();
+                    var result = await response.Content.ReadFromJsonAsync<Result<NoteResponse>>();
+                    return result ?? Result<NoteResponse>.Failure("Note not created");
+                }
+                else
+                {
+                    return Result<NoteResponse>.Failure("Note not created");
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+                return Result<NoteResponse>.Failure(ex.Message);
             }
-
-            return null;
         }
 
         // PUT: api/note/{id}
         // Routing: String interpolation inserts {id} into path (e.g., "api/note/5").
         // Controller Matching: NoteController.cs sees HTTP PUT -> matches [HttpPut("{id}")] attribute and binds {id} from URL to 'int id'.
-        public async Task<NoteResponse?> UpdateNoteAsync(int id, CreateNoteRequest request)
+        public async Task<Result<NoteResponse>> UpdateNoteAsync(int id, CreateNoteRequest request)
         {
+            var response = await _http.PutAsJsonAsync($"api/note/{id}", request);
             try
             {
-                // Updated from PostAsJsonAsync to PutAsJsonAsync to match standard HTTP PUT endpoints
-                var response = await _http.PutAsJsonAsync($"api/note/{id}", request);
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<NoteResponse>();
+                    var result = await response.Content.ReadFromJsonAsync<Result<NoteResponse>>();
+                    return result ?? Result<NoteResponse>.Failure("Note not updated");
+                }
+                else
+                {
+                    return Result<NoteResponse>.Failure("Note not updated");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+                return Result<NoteResponse>.Failure(ex.Message);
             }
-
-            return null;
         }
 
         // DELETE: api/note/{id}
         // Routing: Sends HTTP DELETE to "api/note/5".
         // Controller Matching: NoteController.cs sees HTTP DELETE -> matches [HttpDelete("{id}")] attribute and binds route segment to 'int id'.
-        public async Task<bool> DeleteNoteAsync(int id)
+        public async Task<Result<NoteResponse>> DeleteNoteAsync(int id)
         {
+            var response = await _http.DeleteAsync($"api/note/{id}");
             try
             {
-                var response = await _http.DeleteAsync($"api/note/{id}");
-                return response.IsSuccessStatusCode;
+                var result = await response.Content.ReadFromJsonAsync<Result<NoteResponse>>();
+                return result ?? Result<NoteResponse>.Failure("Note not deleted");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+                return Result<NoteResponse>.Failure(ex.Message);
             }
-
-            return false;
         }
-
         #endregion
     }
 }

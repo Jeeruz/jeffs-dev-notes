@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NoteBook.Shared
+namespace NoteBook.Shared.Entities
 {
     public class Category
     {

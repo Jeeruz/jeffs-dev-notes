@@ -26,7 +26,8 @@ builder.Services.AddBlazorStrap();
 
 // Register Client Managers
 builder.Services.AddScoped<INoteService, NoteService>();
-builder.Services.AddScoped<ICategory, CategoryService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IToastService, ToastService>();
 
 // ===================================================================================
 // APPLICATION HOST BUILD & RUN
