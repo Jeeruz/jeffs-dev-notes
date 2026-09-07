@@ -32,7 +32,6 @@ namespace NoteBook.Application.Commands
 
                 // Stage and persist the new record to the database asynchronously
                 _db.Notes.Add(note);
-
                 await _db.SaveChangesAsync(cancellationToken);
 
                 // Fetch related entity data to complete the response contract

@@ -1,5 +1,6 @@
-﻿using System.Net.Http.Json;
-using NoteBook.Client.Interfaces;
+﻿using NoteBook.Client.Interfaces;
+using NoteBook.Shared.Common;
+using System.Net.Http.Json;
 using NoteBook.Shared.DTOs;
 
 namespace NoteBook.Client.Services
@@ -36,28 +37,31 @@ namespace NoteBook.Client.Services
         // POST: api/category
         // Routing: Sends HTTP POST with JSON body payload.
         // Controller Matching: CategoryController.cs handles payload via [HttpPost] CreateCategory([FromBody] CreateCategoryRequest request).
-        public async Task<CategoryResponse?> CreateCategoryAsync(CreateCategoryRequest request)
+        public async Task<Result<CategoryResponse>> CreateCategoryAsync(CreateCategoryRequest request)
         {
+            var response = await _http.PostAsJsonAsync("api/category", request);
             try
-            {
-                var response = await _http.PostAsJsonAsync("api/category", request);
+            {             
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<CategoryResponse>();
+                    var result = await response.Content.ReadFromJsonAsync<Result<CategoryResponse>>();
+                    return result ?? Result<CategoryResponse>.Failure("Note not created");
+                }
+                else
+                {
+                    return Result<CategoryResponse>.Failure("Note not created");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+                return Result<CategoryResponse>.Failure(ex.Message);
             }
-
-            return null;
         }
 
         // PUT: api/category/{id}
         // Routing: Passes {id} directly in URI path (e.g., "api/category/3").
         // Controller Matching: CategoryController.cs receives request -> matches [HttpPut("{id}")] -> maps URL path parameter to 'int id' and body to 'UpdateCategoryRequest request'.
-        public async Task<CategoryResponse?> UpdateCategoryAsync(int id, CreateCategoryRequest request)
+        public async Task<Result<CategoryResponse>> UpdateCategoryAsync(int id, CreateCategoryRequest request)
         {
             try
             {
@@ -65,50 +69,36 @@ namespace NoteBook.Client.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return await response.Content.ReadFromJsonAsync<CategoryResponse>();
+                    var result = await response.Content.ReadFromJsonAsync<Result<CategoryResponse>>();
+                    return result ?? Result<CategoryResponse>.Failure("Category not updated");
+                }
+                else
+                {
+                    return Result<CategoryResponse>.Failure("Category not updated");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+                return Result<CategoryResponse>.Failure(ex.Message);
             }
-
-            return null;
         }
 
         // DELETE: api/category/{id}
         // Routing: Sends HTTP DELETE call with path parameter (e.g., "api/category/3").
         // Controller Matching: CategoryController.cs matches [HttpDelete("{id}")] -> converts route segment '3' into method parameter 'int id'.
-        public async Task<bool> DeleteCategoryAsync(int id)
+        public async Task<Result<CategoryResponse>> DeleteCategoryAsync(int id)
         {
+            var response = await _http.DeleteAsync($"api/category/{id}");
             try
             {
-                var response = await _http.DeleteAsync($"api/category/{id}");
-                return response.IsSuccessStatusCode;
+                var result = await response.Content.ReadFromJsonAsync<Result<CategoryResponse>>();
+                return result ?? Result<CategoryResponse>.Failure("Category not deleted");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
+                return Result<CategoryResponse>.Failure(ex.Message);
             }
-
-            return false;
         }
-
-        public async Task<bool> DeleteCategoryAsync2(int id)
-        {
-            try
-            {
-                var response = await _http.DeleteAsync($"api/category/{id}");
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[NoteManager Error]: {ex.Message}");
-            }
-
-            return false;
-        }
-
         #endregion
     }
 }

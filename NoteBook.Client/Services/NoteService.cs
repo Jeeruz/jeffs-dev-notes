@@ -91,7 +91,7 @@ namespace NoteBook.Client.Services
             try
             {
                 var result = await response.Content.ReadFromJsonAsync<Result<NoteResponse>>();
-                return result ?? Result<NoteResponse>.Failure("Note not created");
+                return result ?? Result<NoteResponse>.Failure("Note not deleted");
             }
             catch (Exception ex)
             {
